@@ -1,5 +1,6 @@
 import importlib
 import requests
+import sys
 import os
 import re
 
@@ -52,9 +53,14 @@ if __name__ == '__main__':
     upgrade()
     list_local_pocs()
     list_remote_pocs()
-    poc = "test"
-    target = "https://www.baidu.com"
+    poc = sys.argv[1]
+    target = sys.argv[2]
+    if target[-1] != "/":
+        url = target + "/"
+    else:
+        url = target
     runner = importlib.import_module('pocs.' + poc)
-    if runner.poc(target):
-        print(target + " ===>  Vuln!")
-    
+    if runner.poc(url):
+        print(url + " ===>  Vuln!")
+    else:
+        print(url + " ===>  NotVuln!")
