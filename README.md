@@ -4,7 +4,7 @@ Demo:  spring4shell
 docker run -d -p 9999:8080 vulhub/spring-webmvc:5.3.17
 
 ```bash
-python hades.py spring4shell http://10.1.129.82:9999
+python hades.py -p spring4shell -t http://10.1.129.82:9999
 当前版本1.0.0
 最新版本1.0.0
 本地存在poc列表：
