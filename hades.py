@@ -1,12 +1,22 @@
+from tomorrow3 import threads
 import importlib
 import requests
+import argparse
 import sys
 import os
 import re
 
 proxy ={"http": "socks5h://127.0.0.1:10808", "https": "socks5h://127.0.0.1:10808"}
-version = "1.0.0"
+version = "1.0.1"
 
+def parse_args():
+    description = "Are you hacker?!!!"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('-p',help = "POC") 
+    parser.add_argument('-t',help = "target") 
+    parser.add_argument('-f',help = "target file") 
+    args = parser.parse_args()       
+    return args
 
 def upgrade():
     print("当前版本" + version)
@@ -49,18 +59,27 @@ def list_remote_pocs():
             with open("pocs/" + poc + ".py","wb") as f:
                 f.write(response.content)
 
-if __name__ == '__main__':
-    upgrade()
-    list_local_pocs()
-    list_remote_pocs()
-    poc = sys.argv[1]
-    target = sys.argv[2]
-    if target[-1] != "/":
+@threads(50)
+def check(target,runner):
+    if 'http' in target and target[-1] != "/":
         url = target + "/"
     else:
         url = target
-    runner = importlib.import_module('pocs.' + poc)
+    
     if runner.poc(url):
         print(url + " ===>  Vuln!")
     else:
         print(url + " ===>  NotVuln!")
+
+if __name__ == '__main__':
+    upgrade()
+    list_local_pocs()
+    list_remote_pocs()
+    args = parse_args()
+    runner = importlib.import_module('pocs.' + args.p)
+    if args.t:
+        check(args.t, runner)
+    if args.f:
+        for target in open(args.f):
+            check(target.strip(), runner)
+    
